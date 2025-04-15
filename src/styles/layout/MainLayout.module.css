@@ -1,0 +1,15 @@
+.mainLayout {
+  padding-top: var(--header-height);
+  min-height: 100vh;
+  background-color: var(--background-gray);
+}
+
+.pageContent {
+  padding: var(--spacing-lg);
+}
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  width: 100%;
+} 

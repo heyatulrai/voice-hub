@@ -23,8 +23,10 @@ import {
   PlayCircleOutlined,
   PauseCircleOutlined,
   StarOutlined,
-  EnvironmentOutlined
+  EnvironmentOutlined,
+  ReloadOutlined
 } from '@ant-design/icons';
+import styles from '../styles/pages/HomePage.module.css';
 
 const { Content } = Layout;
 const { Search } = Input;
@@ -124,6 +126,11 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const handleReset = () => {
+    setSearchTerm('');
+    setSelectedCategory('');
+  };
+
   const filteredActors = actors.filter(actor => {
     const matchesSearch = searchTerm === '' ||
       actor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -156,15 +163,17 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="p-6">
-      <div className="max-w-7xl mx-auto">
-        <Row gutter={16} className="mb-8">
+    <div className={styles.container}>
+      <div className={styles.content}>
+        <Row gutter={16} className={styles.searchSection} align="middle">
           <Col flex="auto">
             <Search
               placeholder="Search voice actors by name, skill, or language..."
               allowClear
               onSearch={handleSearch}
               size="large"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </Col>
           <Col flex="none">
@@ -174,11 +183,22 @@ const HomePage: React.FC = () => {
               onChange={handleCategoryChange}
               allowClear
               size="large"
+              value={selectedCategory}
             >
               {categories.map(category => (
                 <Option key={category} value={category}>{category}</Option>
               ))}
             </Select>
+          </Col>
+          <Col flex="none">
+            <Button 
+              icon={<ReloadOutlined />}
+              onClick={handleReset}
+              size="large"
+              title="Reset all filters"
+            >
+              Reset
+            </Button>
           </Col>
         </Row>
 

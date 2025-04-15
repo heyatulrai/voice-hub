@@ -1,0 +1,14 @@
+.container {
+  padding: var(--spacing-lg);
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+}
+
+.backButton:hover {
+  color: var(--primary-color);
+} 
