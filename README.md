@@ -133,9 +133,11 @@ A web-based platform to discover, listen to, and hire professional voice actors.
 
 ## 🤖 AI Tools Used
 
-- **lovable / Cursor / ChatGPT**
+- **Cursor / ChatGPT**
   - Schema design
-  - Component generation (cards, modal, widgets)
+  - Querying Supabase and understanding it
+  - Component generation (cards, modal, widgets using AntD)
+  - User Authentication flow
   - Code scaffolding and documentation
 
 ---
