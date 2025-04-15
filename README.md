@@ -66,7 +66,6 @@ A web-based platform to discover, listen to, and hire professional voice actors.
 | Layer        | Technology           |
 |--------------|----------------------|
 | Frontend     | React                |
-| Backend      | Optional FastAPI     |
 | Database     | Supabase (PostgreSQL)|
 | File Storage | Supabase Storage     |
 
