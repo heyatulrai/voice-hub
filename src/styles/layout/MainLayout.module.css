@@ -4,9 +4,9 @@
   background-color: var(--background-gray);
 }
 
-.pageContent {
+/* .pageContent {
   padding: var(--spacing-lg);
-}
+} */
 
 .container {
   max-width: var(--container-max-width);

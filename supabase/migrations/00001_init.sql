@@ -53,12 +53,15 @@ CREATE TABLE reviews (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+-- Add reviewer_id to reviews table
+ALTER TABLE reviews ADD COLUMN reviewer_id UUID REFERENCES auth.users(id);
 
 -- Create indexes for better query performance
 CREATE INDEX idx_voice_actors_rating ON voice_actors(rating);
 CREATE INDEX idx_voice_actors_location ON voice_actors(location);
 CREATE INDEX idx_jobs_voice_actor_id ON jobs(voice_actor_id);
 CREATE INDEX idx_reviews_voice_actor_id ON reviews(voice_actor_id);
+CREATE INDEX idx_reviews_reviewer_id ON reviews(reviewer_id);
 
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -91,4 +94,15 @@ CREATE INDEX idx_voice_actors_skills ON voice_actors USING gin (skills);
 CREATE INDEX idx_voice_actors_languages ON voice_actors USING gin (languages);
 
 -- Enable the pg_trgm extension for better text search
-CREATE EXTENSION IF NOT EXISTS pg_trgm; 
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+-- Create a view for public user profiles
+CREATE VIEW public.user_profiles AS
+SELECT 
+  id,
+  COALESCE(raw_user_meta_data->>'display_name', email) as display_name
+FROM auth.users;
+
+-- Grant access to the view
+GRANT SELECT ON public.user_profiles TO authenticated;
+GRANT SELECT ON public.user_profiles TO anon;

@@ -1,6 +1,7 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { Spin } from 'antd';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -8,7 +9,29 @@ interface AuthGuardProps {
 }
 
 const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAuth = false }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    // Wait for auth state to be determined
+    if (!loading) {
+      setIsReady(true);
+    }
+  }, [loading]);
+
+  if (!isReady) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh'
+      }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   // If user is authenticated and trying to access auth pages (signin/signup)
   if (user && !requireAuth) {
@@ -17,7 +40,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAuth = false }) 
 
   // If user is not authenticated and trying to access protected pages
   if (!user && requireAuth) {
-    return <Navigate to="/signin" replace />;
+    return <Navigate to="/signin" replace state={{ from: location }} />;
   }
 
   return <>{children}</>;

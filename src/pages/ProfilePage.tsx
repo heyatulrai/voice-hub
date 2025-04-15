@@ -45,6 +45,8 @@ import {
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import styles from '../styles/pages/ProfilePage.module.css';
+import ReviewForm from '../components/reviews/ReviewForm';
+import ReviewList from '../components/reviews/ReviewList';
 
 dayjs.extend(relativeTime);
 
@@ -73,6 +75,9 @@ const ProfilePage: React.FC = () => {
     budget: 0,
     approval_method: 'single_step'
   });
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   // Add voice character options
   const voiceCharacterOptions = [
@@ -125,6 +130,7 @@ const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     fetchVoiceActor();
+    fetchReviews();
   }, [id]);
 
   const fetchVoiceActor = async () => {
@@ -149,7 +155,7 @@ const ProfilePage: React.FC = () => {
       // Calculate average rating
       const reviewCount = reviewsData?.length || 0;
       const averageRating = reviewCount > 0
-        ? reviewsData.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+        ? Math.round(reviewsData.reduce((sum, review) => sum + review.rating, 0) / reviewCount)
         : 0;
 
       // Combine actor data with review stats
@@ -165,6 +171,37 @@ const ProfilePage: React.FC = () => {
       message.error('Failed to fetch voice actor details');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select(`
+          *,
+          reviewer:user_profiles!reviewer_id (
+            display_name
+          )
+        `)
+        .eq('voice_actor_id', id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      const reviewsWithNames = (data || []).map(review => ({
+        ...review,
+        reviewer: {
+          name: review.reviewer?.display_name || 'Anonymous'
+        }
+      }));
+
+      setReviews(reviewsWithNames);
+    } catch (error) {
+      message.error('Failed to fetch reviews');
+      console.error('Error:', error);
+    } finally {
+      setReviewsLoading(false);
     }
   };
 
@@ -326,10 +363,10 @@ const ProfilePage: React.FC = () => {
                             <Divider type="vertical" />
                             <Space>
                               <StarOutlined style={{ color: '#faad14' }} />
-                              <Text>{actor.rating.toFixed(1)}</Text>
+                              <Text>{actor.rating}</Text>
                               <Text type="secondary">({actor.review_count} reviews)</Text>
                             </Space>
-                            <Rate disabled defaultValue={actor.rating} style={{ fontSize: 14 }} />
+                            <Rate disabled defaultValue={Math.round(actor.rating)} style={{ fontSize: 14 }} />
                           </Space>
                         </div>
                       </Space>
@@ -477,10 +514,19 @@ const ProfilePage: React.FC = () => {
 
                 {/* Recent Reviews */}
                 <Card className="shadow-sm">
-                  <Title level={4}>Recent Reviews</Title>
+                  <div className="flex justify-between items-center mb-4">
+                    <Title level={4} style={{ margin: 0 }}>Recent Reviews</Title>
+                    <Button 
+                      type="primary"
+                      onClick={() => setShowReviewModal(true)}
+                      icon={<StarOutlined />}
+                    >
+                      Write Review
+                    </Button>
+                  </div>
                   <List
                     itemLayout="vertical"
-                    dataSource={actor.reviews || []}
+                    dataSource={reviews}
                     locale={{ emptyText: 'No reviews yet' }}
                     renderItem={review => (
                       <List.Item>
@@ -488,7 +534,7 @@ const ProfilePage: React.FC = () => {
                           avatar={<Avatar icon={<UserOutlined />} />}
                           title={
                             <Space>
-                              <Text strong>Client Review</Text>
+                              <Text strong>{review.reviewer?.name || 'Anonymous'}</Text>
                               <Rate disabled value={review.rating} />
                             </Space>
                           }
@@ -503,9 +549,26 @@ const ProfilePage: React.FC = () => {
             </Col>
           </Row>
 
+          {/* Review Modal */}
+          <Modal
+            title="Write a Review"
+            open={showReviewModal}
+            onCancel={() => setShowReviewModal(false)}
+            footer={null}
+            destroyOnClose
+          >
+            <ReviewForm 
+              voiceActorId={id!} 
+              onSuccess={() => {
+                setShowReviewModal(false);
+                fetchReviews();
+              }} 
+            />
+          </Modal>
+
           {/* Job Modal */}
           <Modal
-            title="Create Job Invitation"
+            title="Invite to Job"
             open={showJobModal}
             onCancel={() => setShowJobModal(false)}
             footer={null}
@@ -578,6 +641,7 @@ const ProfilePage: React.FC = () => {
                   <Form.Item
                     name="accent"
                     label="Accent"
+                    rules={[{ required: true, message: 'Please select accent' }]}
                   >
                     <Select>
                       <Option value="">Select Accent</Option>
@@ -603,6 +667,7 @@ const ProfilePage: React.FC = () => {
               <Form.Item
                 name="script_url"
                 label="Script Upload"
+                rules={[{ required: true, message: 'Please upload the script' }]}
               >
                 <div>
                   <Upload
