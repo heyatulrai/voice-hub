@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
+import NotFound from './pages/NotFound';
 import AuthGuard from './components/auth/AuthGuard';
 import { AuthProvider } from './contexts/AuthContext';
 import styles from './styles/layout/MainLayout.module.css';
@@ -18,7 +19,14 @@ const App: React.FC = () => {
           <main className={`${styles.pageContent} pt-[72px]`}>
             <div className={styles.container}>
               <Routes>
-                <Route path="/" element={<HomePage />} />
+                <Route 
+                  path="/" 
+                  element={
+                    <AuthGuard requireAuth>
+                      <HomePage />
+                    </AuthGuard>
+                  } 
+                />
                 <Route 
                   path="/profile/:id" 
                   element={
@@ -43,6 +51,7 @@ const App: React.FC = () => {
                     </AuthGuard>
                   } 
                 />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
           </main>
