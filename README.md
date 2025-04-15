@@ -29,7 +29,7 @@ A web-based platform to discover, listen to, and hire professional voice actors.
 - Category filters: Animation, Commercial, Audiobook, etc.
 - Voice actor cards with:
   - Profile picture, name
-  - Rating (e.g., 4.7/5)
+  - Rating (e.g., 4/5)
   - Review count (e.g., 25 reviews)
   - Playable audio snippet
   - CTA: "View Details"
@@ -75,19 +75,24 @@ A web-based platform to discover, listen to, and hire professional voice actors.
 
 ### 🗂 `voice_actors`
 | Field             | Type       |
-|------------------|------------|
-| id               | UUID       |
-| name             | String     |
-| location         | String     |
-| rating           | Float      |
-| review_count     | Integer    |
-| certifications   | String[]   |
-| audio_snippets   | File[]     |
-| bio              | Text       |
-| last_online      | Timestamp  |
-| reply_time       | String     |
-| completed_jobs   | Integer    |
-| past_clients     | String[]   |
+|------------------ |------------|
+| id                | UUID       |
+| name              | String     |
+| location          | String     |
+|profile_picture_url| Text       |
+|demo_audio_url     | Text       |
+|skills             | Text[]     |
+|languages          | Text[]     |
+| rating            | Integer    |
+| review_count      | Integer    |
+| certifications    | String[]   |
+| audio_snippets    | File[]     |
+| bio               | Text       |
+| last_online       | Timestamp  |
+| last_hired        | Timestamp  |
+| reply_time        | String     |
+| completed_jobs    | Integer    |
+| past_clients      | String[]   |
 
 ### 🗂 `jobs`
 | Field                | Type       |
@@ -99,12 +104,13 @@ A web-based platform to discover, listen to, and hire professional voice actors.
 | voice_characteristics| String[]   |
 | language             | String     |
 | accent               | String     |
-| gender               | String     |
+| voice+gender         | String     |
 | script_url           | String     |
 | audio_length         | Float      |
 | deadline             | Date       |
 | budget               | Float      |
 | approval_method      | Text       |
+| status               | Text       |
 
 ### 🗂 `reviews`
 | Field         | Type      |
@@ -113,6 +119,7 @@ A web-based platform to discover, listen to, and hire professional voice actors.
 | voice_actor_id| UUID (FK) |
 | rating        | Float     |
 | review_text   | Text      |
+| reviewer_id   | UUID (FK) |
 | created_at    | Timestamp |
 
 ---
@@ -129,7 +136,6 @@ A web-based platform to discover, listen to, and hire professional voice actors.
 - **lovable / Cursor / ChatGPT**
   - Schema design
   - Component generation (cards, modal, widgets)
-  - UI layout brainstorming
   - Code scaffolding and documentation
 
 ---
@@ -137,7 +143,6 @@ A web-based platform to discover, listen to, and hire professional voice actors.
 ## 🧪 Running the App Locally
 
 ### ✅ Prerequisites
-- Django >= 5.0
 - Supabase account/project
 - Git
 
@@ -147,4 +152,4 @@ A web-based platform to discover, listen to, and hire professional voice actors.
 cd voice-actor-marketplace
 npm install
 # Create `.env.local` and set Supabase URL + anon key
-npm run dev
+npm start
